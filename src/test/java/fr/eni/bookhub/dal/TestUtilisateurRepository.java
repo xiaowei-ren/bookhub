@@ -123,5 +123,4 @@ public class TestUtilisateurRepository {
         assertThat(utilisateurTrouve.isAccordRgpd()).isEqualTo(utilisateur.isAccordRgpd());
     }
 
-
 }

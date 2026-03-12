@@ -60,6 +60,7 @@ public class TestUtilisateurService {
                .build();
 
         when(passwordEncoder.encode("Hez67@C1oz!Aci24")).thenReturn("hashedPassword");
+        when(utilisateurRepository.save(utilisateur)).thenReturn(utilisateur);
         when(utilisateurRepository.findById(email)).thenReturn(Optional.of(utilisateur));
 
         //Act

@@ -1,10 +1,12 @@
 package fr.eni.bookhub.bll;
 
 import fr.eni.bookhub.bo.Utilisateur;
+import fr.eni.bookhub.bo.UtilisateurReponse;
 import fr.eni.bookhub.dal.UtilisateurRepository;
 import fr.eni.bookhub.exceptions.BusinessCode;
 import fr.eni.bookhub.exceptions.BusinessException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Service;
  * et de la mise à jour des informations d'un utilisateur existant.
  * Ce service n'est PAS responsable de l'authentification des utilisateurs
  */
-
+@Slf4j
 @AllArgsConstructor
 @Service
 public class UtilisateurServiceImpl implements UtilisateurService {
@@ -23,7 +25,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Utilisateur ajouterUtilisateur(Utilisateur utilisateur) {
+    public UtilisateurReponse ajouterUtilisateur(Utilisateur utilisateur) {
 
         BusinessException be = new BusinessException();
         boolean isValid = true;
@@ -34,9 +36,12 @@ public class UtilisateurServiceImpl implements UtilisateurService {
             try {
                 utilisateur.setRole("ROLE_READER");
                 utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
-                return utilisateurRepository.save(utilisateur);
+                Utilisateur utilisateurBD = utilisateurRepository.save(utilisateur);
+                UtilisateurReponse utilisateurReponse = new UtilisateurReponse(utilisateurBD.getEmail(), utilisateurBD.getNom(), utilisateurBD.getPrenom());
+                return utilisateurReponse;
             } catch (RuntimeException err){
-                be.add(BusinessCode.REPOSITORY_UTILISATEUR_SAVE_ERREUR + utilisateur);
+                log.error("Erreur lors de la sauvegarde de l'utilisateur {}", utilisateur.getEmail(), err);
+                be.add(BusinessCode.REPOSITORY_UTILISATEUR_SAVE_ERREUR);
                 throw be;
             }
         } else {

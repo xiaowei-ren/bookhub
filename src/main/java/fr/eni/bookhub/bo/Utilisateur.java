@@ -9,6 +9,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 
 /**
@@ -19,7 +25,9 @@ import lombok.*;
 @Builder
 @Entity
 @Table( name = "BOOKHUB_USER")
-public class Utilisateur {
+public class Utilisateur implements UserDetails {
+
+    private static final long serialVersionUID=1L;
 
     @Id
     @NotBlank(message = "{utilisateur.email.blank-error}")
@@ -46,7 +54,7 @@ public class Utilisateur {
      * 8 caractères minimum
      */
     @NotBlank(message = "{utilisateur.password.blank-error}")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$", message = "{utilisateur.password.regex-error}")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&]).{12,}$", message = "{utilisateur.password.regex-error}")
     @Size(max = 255, message = "{utilisateur.password.size-error}")
     @ToString.Exclude
     @Column (nullable = false, length = 255)
@@ -72,5 +80,17 @@ public class Utilisateur {
     @Column( name = "GDPR_AGREEMENT", nullable = false)
     @Builder.Default
     private boolean accordRgpd = false;
+
+    // Méthodes de UserDetails
+    //Correspond aux rôles de l'utilisateur
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Arrays.asList(new SimpleGrantedAuthority(role));
+    }
+    // Correspond au pseudo unique d'authentification
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
 }
