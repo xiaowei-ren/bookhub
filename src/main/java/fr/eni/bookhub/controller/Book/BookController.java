@@ -52,6 +52,16 @@ public class BookController {
     }
 
     /**
+     * Rechercher par titre ou par auteur .
+     * GET /api/books/search?keyword=mot-clé
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> searchBooks(@RequestParam String keyword) {
+        List<Book> books = bookService.searchByTitleOrAuthor(keyword);
+        return ResponseEntity.ok(books);
+    }
+
+    /**
      * Supprime un livre par son ISBN.
      * DELETE /api/books/{isbn}
      */

@@ -27,7 +27,7 @@ public interface BookService {
      * @param keyword Le mot-clé à rechercher.
      * @return Une liste de livres correspondant au mot-clé.
      */
-    List<Book> searchBooks(String keyword);
+    List<Book> searchByTitleOrAuthor(String keyword);
 
     /**
      * Enregistre ou met à jour un livre dans la base de données.

@@ -27,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @AllArgsConstructor
 public class BookhubSecurityConfig {
-
+    /*
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private AuthenticationProvider authenticationProvider;
@@ -37,7 +37,7 @@ public class BookhubSecurityConfig {
         http.authorizeHttpRequests(auth -> {auth
                 /*
                  * Endpoints publics permettant l'inscription et l'authentification
-                 */
+
                 .requestMatchers("/bookhub/auth/**").permitAll()
 
                 .anyRequest().authenticated();
@@ -58,5 +58,6 @@ public class BookhubSecurityConfig {
 
         return http.build();
     }
+    */
 
 }

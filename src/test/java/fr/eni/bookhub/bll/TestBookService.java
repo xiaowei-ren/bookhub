@@ -24,58 +24,77 @@ public class TestBookService {
     @InjectMocks
     private BookServiceImpl bookService;
 
+    // 1. Test de la méthode findAll
     @Test
     void testFindAll_ReturnsListOfBooks() {
-        // Mocking du repository pour retourner une liste de livres
-        List<Book> mockBooks = Arrays.asList(
-                new Book(
-                        "9781338299144",
-                        "harry potter and the sorcerer's stone",
-                        "JK Rowling",
-                        "Roman",
-                        "Description du livre",
-                        100,
-                        "https://images-na.ssl-images-amazon.com/images/I/51UoqwM9sDL._SX331_BO1,204,203,200_.jpg"
-                ),
-                new Book(
-                        "1234567890123",
-                        "Hugo and the Fire Cup",
-                        "John Doe",
-                        "Documentaire",
-                        "Description du document",
-                        20,
-                        "https://placekittens.com/200/300"
-                )
-        );
+        List<Book> mockBooks = Arrays.asList(Book.builder().isbn("1235739011235").build(), Book.builder().isbn("456").build());
         when(bookRepository.findAll()).thenReturn(mockBooks);
 
-        // WHEN
         List<Book> result = bookService.findAll();
 
-        // THEN
         assertEquals(2, result.size());
         verify(bookRepository, times(1)).findAll();
     }
 
+    //  2. Test de la méthode getBookByIsbn
+
     @Test
-    void testGetBookByIsbn_Found() {
-        // GIVEN
-        Book book = new Book(
-                "1234567890123",
-                "Java Guide",
-                "John Doe",
-                "Programmation",
-                "Description du livre",
-                100,
-                "https://placekittens.com/200/300"
-        );
-        when(bookRepository.findById("123")).thenReturn(Optional.of(book));
+    void testGetBookByIsbn_ReturnsBook() {
+        String isbn = "1234567890123";
+        Book mockBook = Book.builder().isbn(isbn).title("Java Guide").build();
+        when(bookRepository.findById(isbn)).thenReturn(Optional.of(mockBook));
 
-        // WHEN
-        Optional<Book> result = bookService.getBookByIsbn("123");
+        Optional<Book> result = bookService.getBookByIsbn(isbn);
 
-        // THEN
         assertTrue(result.isPresent());
         assertEquals("Java Guide", result.get().getTitle());
+    }
+
+    // 3. Test de la méthode getBookByIsbn (cas où le livre est introuvable)
+    @Test
+    void testGetBookByIsbn_ReturnsEmpty() {
+        String isbn = "1234567890123";
+        when(bookRepository.findById(isbn)).thenReturn(Optional.empty());
+
+        Optional<Book> result = bookService.getBookByIsbn(isbn);
+
+        assertFalse(result.isPresent());
+        verify(bookRepository, times(1)).findById(isbn);
+    }
+
+    // 4. Test de la méthode de recherche multicritère
+    @Test
+    void testSearchByTitleOrAuthor_ReturnsListOfBooks() {
+        String keyword = "Java";
+        List<Book> mockBooks = Arrays.asList(Book.builder().title("Java Guide").build());
+        when(bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(keyword, keyword))
+                .thenReturn(mockBooks);
+
+        List<Book> result = bookService.searchByTitleOrAuthor(keyword);
+
+        assertEquals(1, result.size());
+        assertEquals("Java Guide", result.get(0).getTitle());
+    }
+
+    // 5. Test de la méthode saveBook
+    @Test
+    void testSaveBook_ReturnsSavedBook() {
+        Book book = Book.builder().isbn("123").build();
+        when(bookRepository.save(book)).thenReturn(book);
+
+        Book result = bookService.saveBook(book);
+
+        assertNotNull(result);
+        verify(bookRepository, times(1)).save(book);
+    }
+
+    // 6. Test de la méthode deleteBook
+    @Test
+    void testDeleteBook_VerifiesDeletion() {
+        String isbn = "1234567890123";
+
+        bookService.deleteBook(isbn);
+
+        verify(bookRepository, times(1)).deleteById(isbn);
     }
 }
