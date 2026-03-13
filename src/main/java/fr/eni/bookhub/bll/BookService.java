@@ -16,6 +16,12 @@ public interface BookService {
     List<Book> findAll();
 
     /**
+     * Récupère tous les livres disponibles.
+     * @return Une liste de tous les livres.
+     */
+    List<Book> findAllAvailable();
+
+    /**
      * Récupère un livre spécifique à partir de son numéro ISBN.
      * @param isbn Le numéro ISBN du livre.
      * @return Un Optional contenant le livre s'il est trouvé, sinon vide.

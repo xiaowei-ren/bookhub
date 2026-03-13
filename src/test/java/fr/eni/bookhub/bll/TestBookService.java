@@ -65,15 +65,31 @@ public class TestBookService {
     // 4. Test de la méthode de recherche multicritère
     @Test
     void testSearchByTitleOrAuthor_ReturnsListOfBooks() {
+
         String keyword = "Java";
-        List<Book> mockBooks = Arrays.asList(Book.builder().title("Java Guide").build());
-        when(bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(keyword, keyword))
+        int minCopies = 0;
+
+        List<Book> mockBooks = Arrays.asList(
+                Book.builder().isbn("123566790").nbCopies(5).build(), // 确保测试数据本身是“可用”的
+                Book.builder().isbn("456").nbCopies(2).build()
+        );
+
+
+        when(bookRepository.findByNbCopiesGreaterThanAndTitleContainingIgnoreCaseOrNbCopiesGreaterThanAndAuthorContainingIgnoreCase(
+                minCopies, keyword, minCopies, keyword))
                 .thenReturn(mockBooks);
+
 
         List<Book> result = bookService.searchByTitleOrAuthor(keyword);
 
-        assertEquals(1, result.size());
-        assertEquals("Java Guide", result.get(0).getTitle());
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(5, result.get(0).getNbCopies());
+
+
+        verify(bookRepository, times(1)).findByNbCopiesGreaterThanAndTitleContainingIgnoreCaseOrNbCopiesGreaterThanAndAuthorContainingIgnoreCase(
+                minCopies, keyword, minCopies, keyword);
     }
 
     // 5. Test de la méthode saveBook
@@ -92,9 +108,12 @@ public class TestBookService {
     @Test
     void testDeleteBook_VerifiesDeletion() {
         String isbn = "1234567890123";
+        Book mockBook = Book.builder().isbn(isbn).nbCopies(5).build();
+        when(bookRepository.findById(isbn)).thenReturn(Optional.of(mockBook));
 
         bookService.deleteBook(isbn);
 
-        verify(bookRepository, times(1)).deleteById(isbn);
+        assertEquals(0, mockBook.getNbCopies());
+        verify(bookRepository, times(1)).save(mockBook);
     }
 }

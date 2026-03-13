@@ -7,34 +7,43 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Contrôleur REST pour gérer les opérations sur les livres.
- */
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
     private final BookService bookService;
 
-    // Injection du service via le constructeur
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
     /**
-     * Récupère tous les livres.
-     * GET /api/books
+     * ADMIN ONLY : Récupère TOUS les livres (y compris ceux à 0 exemplaire).
      */
-    @GetMapping
+    @GetMapping("/admin/all")
     public List<Book> findAll() {
         return bookService.findAll();
     }
 
     /**
-     * Récupère un livre par son ISBN.
-     * GET /api/books/{isbn}
+     * PUBLIC : Récupère uniquement les livres disponibles (nbCopies > 0).
      */
+    @GetMapping
+    public List<Book> findAllAvailable() {
+        return bookService.findAllAvailable();
+    }
+
+    /**
+     * PUBLIC : Recherche uniquement parmi les livres disponibles.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> searchBooks(@RequestParam String keyword) {
+        // On utilise la méthode filtrée pour ne pas afficher de livres à 0 exemplaire
+        return ResponseEntity.ok(bookService.searchByTitleOrAuthor(keyword));
+    }
+
     @GetMapping("/{isbn}")
     public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
         return bookService.getBookByIsbn(isbn)
@@ -42,28 +51,13 @@ public class BookController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    /**
-     * Ajoute ou met à jour un livre.
-     * POST /api/books
-     */
     @PostMapping
     public Book saveBook(@RequestBody Book book) {
         return bookService.saveBook(book);
     }
 
     /**
-     * Rechercher par titre ou par auteur .
-     * GET /api/books/search?keyword=mot-clé
-     */
-    @GetMapping("/search")
-    public ResponseEntity<List<Book>> searchBooks(@RequestParam String keyword) {
-        List<Book> books = bookService.searchByTitleOrAuthor(keyword);
-        return ResponseEntity.ok(books);
-    }
-
-    /**
-     * Supprime un livre par son ISBN.
-     * DELETE /api/books/{isbn}
+     * LOGIQUE DE SUPPRESSION : Effectue une suppression logique (nbCopies = 0).
      */
     @DeleteMapping("/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
