@@ -16,6 +16,12 @@ public interface BookService {
     List<Book> findAll();
 
     /**
+     * Récupère tous les livres disponibles.
+     * @return Une liste de tous les livres.
+     */
+    List<Book> findAllAvailable();
+
+    /**
      * Récupère un livre spécifique à partir de son numéro ISBN.
      * @param isbn Le numéro ISBN du livre.
      * @return Un Optional contenant le livre s'il est trouvé, sinon vide.
@@ -27,7 +33,7 @@ public interface BookService {
      * @param keyword Le mot-clé à rechercher.
      * @return Une liste de livres correspondant au mot-clé.
      */
-    List<Book> searchBooks(String keyword);
+    List<Book> searchByTitleOrAuthor(String keyword);
 
     /**
      * Enregistre ou met à jour un livre dans la base de données.
