@@ -24,7 +24,7 @@ import java.util.Locale;
  */
 @AllArgsConstructor
 @RestController
-@RequestMapping("bookhub/auth")
+@RequestMapping("/api/auth")
 public class AuthenticationController {
 
     private UtilisateurService utilisateurService;

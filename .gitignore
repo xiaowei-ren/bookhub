@@ -39,4 +39,5 @@ out/
 ### env ###
 .env
 
+##fichiers MacOS##
 .DS_Store
