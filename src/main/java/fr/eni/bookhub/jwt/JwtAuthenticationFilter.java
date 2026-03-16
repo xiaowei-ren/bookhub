@@ -2,6 +2,7 @@ package fr.eni.bookhub.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -30,31 +32,55 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
+//        final String authHeader = request.getHeader("Authorization");
+//        final String jwt;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        jwt = authHeader.substring(7);// 7 correspond à Bearer
+//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//        jwt = authHeader.substring(7);// 7 correspond à Bearer
 
-        final String userEmail = jwtService.extractUserName(jwt);// Extraire du jeton JWT
+        Optional<String> tokenOpt = extractTokenFromCookie(request, "access_token");
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (tokenOpt.isPresent()){
+            String jwt = tokenOpt.get();
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            try {
+                String userEmail = jwtService.extractUserName(jwt);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+                if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userEmail, null, userDetails.getAuthorities());
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    if (jwtService.isTokenValid(jwt, userDetails)) {
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userEmail, null, userDetails.getAuthorities());
+
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                }
+            } catch (Exception e) {
+
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private Optional<String> extractTokenFromCookie(HttpServletRequest request, String cookieName) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookieName.equals(cookie.getName())) {
+                return Optional.ofNullable(cookie.getValue());
+            }
+        }
+
+        return Optional.empty();
     }
 
 }

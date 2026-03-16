@@ -4,6 +4,7 @@ import fr.eni.bookhub.bll.authentication.AuthenticationService;
 import fr.eni.bookhub.bo.Utilisateur;
 import fr.eni.bookhub.bo.authentication.AuthenticationRequest;
 import fr.eni.bookhub.bo.authentication.AuthenticationResponse;
+import fr.eni.bookhub.bo.authentication.AuthenticationResult;
 import fr.eni.bookhub.dal.UtilisateurRepository;
 import fr.eni.bookhub.jwt.JwtService;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ public class TestAuthenticationService {
         when(jwtService.generateToken(user))
                 .thenReturn("fake-jwt-token");
 
-        AuthenticationResponse response =
+        AuthenticationResult response =
                 authenticationService.authenticate(request);
 
         assertEquals("fake-jwt-token", response.getToken());
