@@ -37,9 +37,13 @@ Le projet est composé de deux dépôts :
 Architecture :
 
 Frontend (Angular)
+
 ⬇
+
 API REST (Spring Boot)
+
 ⬇
+
 Base de données (SQL Server)
 
 ## Technologies
