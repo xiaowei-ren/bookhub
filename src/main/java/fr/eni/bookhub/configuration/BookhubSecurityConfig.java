@@ -44,6 +44,7 @@ public class BookhubSecurityConfig {
                  * Endpoints publics permettant l'inscription et l'authentification
                  */
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/v3/api-docs","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html").permitAll()
 
                 .anyRequest().authenticated();
 
