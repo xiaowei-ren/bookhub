@@ -7,15 +7,9 @@ import fr.eni.bookhub.bo.UtilisateurReponse;
 import fr.eni.bookhub.bo.authentication.AuthenticationRequest;
 import fr.eni.bookhub.bo.authentication.AuthenticationResponse;
 
-import fr.eni.bookhub.bo.authentication.AuthenticationResult;
-import fr.eni.bookhub.jwt.JwtService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +27,6 @@ import java.util.Locale;
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-    private final JwtService jwtService;
     private UtilisateurService utilisateurService;
 
     private final AuthenticationService authenticationService;
@@ -54,43 +47,17 @@ public class AuthenticationController {
     }
 
     /**
-     * Authentifie un utilisateur et crée une session d'authentification basée sur JWT.
+     * Authentifie un utilisateur et génère un jeton JWT.
      *
-     * Les identifiants fournis sont validés par le service d'authentification.
-     * Si l'authentification réussit, un jeton JWT est généré puis placé dans un
-     * cookie HTTP sécurisé (HttpOnly). Ce cookie sera automatiquement envoyé par
-     * le navigateur lors des requêtes suivantes afin d'authentifier l'utilisateur.
+     * Si les identifiants fournis sont valides, un jeton d'authentification
+     * est généré et renvoyé dans la réponse.
      *
-     * Le jeton n'est pas renvoyé dans le corps de la réponse afin de limiter son
-     * exposition côté client.
-     *
-     * @param request  informations d'authentification (email et mot de passe)
-     * @param response réponse HTTP utilisée pour ajouter le cookie contenant le JWT
-     * @return réponse HTTP 200 si l'authentification est réussie
+     * @param request informations d'authentification
+     * @return réponse contenant le jeton JWT
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authentifierUtilisateur(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response) {
-
-        AuthenticationResult authenticationResult = authenticationService.authenticate(request);
-
-        ResponseCookie cookie = ResponseCookie.from(("access_token"), authenticationResult.getToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(jwtService.getExpirationSeconds())
-                .sameSite("Lax")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        AuthenticationResponse body = AuthenticationResponse.builder()
-                .prenom(authenticationResult.getPrenom())
-                .role(authenticationResult.getRole())
-                .build();
-
-        return ResponseEntity.ok().body(body);
+    public ResponseEntity<AuthenticationResponse> authentifierUtilisateur(@RequestBody AuthenticationRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
 }

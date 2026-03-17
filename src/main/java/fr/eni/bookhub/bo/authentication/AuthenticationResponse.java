@@ -3,11 +3,6 @@ package fr.eni.bookhub.bo.authentication;
 import lombok.*;
 
 @Data @AllArgsConstructor @NoArgsConstructor @EqualsAndHashCode
-@Builder
 public class AuthenticationResponse {
-
-    private String prenom;
-
-    private String role;
-
+    private String token;
 }
