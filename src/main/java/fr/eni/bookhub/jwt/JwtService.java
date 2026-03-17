@@ -1,10 +1,12 @@
 package fr.eni.bookhub.jwt;
 
+import fr.eni.bookhub.bo.Utilisateur;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jdk.jshell.execution.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,15 +46,20 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, Utilisateur userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(Utilisateur userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        extraClaims.put("firstName", userDetails.getPrenom());
+        extraClaims.put("role", userDetails.getAuthorities());
+
+        return generateToken(extraClaims, userDetails);
     }
 
     private Date extractExpiration(String token) {
