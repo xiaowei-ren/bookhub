@@ -12,10 +12,18 @@ Le projet est composé de deux applications :
 - [un frontend développé avec **Angular**](https://github.com/Ortender/bookhub_frontend)
 
 ## Aperçu
-![Catalogue]()
-![Inscription](<img width="1363" height="677" alt="image" src="https://github.com/user-attachments/assets/cd9eec57-8bae-4e66-ae52-905db7771b25" />)
-![Connexion](<img width="1362" height="678" alt="image" src="https://github.com/user-attachments/assets/bc90e212-b150-471f-8691-2cbed48f21e4" />)
 
+### Catalogue
+
+### Inscription
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cd9eec57-8bae-4e66-ae52-905db7771b25" width="800"/>
+</p>
+
+### Connexion
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/bc90e212-b150-471f-8691-2cbed48f21e4" width="800"/>
+</p>
 
 ## Architecture
 
