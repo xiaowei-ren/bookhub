@@ -28,7 +28,7 @@ public class BookController {
     }
 
     /**
-     * PUBLIC : Récupère uniquement les livres disponibles (nbCopies > 0).
+     * PUBLIC : Récupère uniquement les livres disponibles dans le catalogue (nbCopies > 0).
      */
     @GetMapping
     public List<Book> findAllAvailable() {
@@ -36,7 +36,7 @@ public class BookController {
     }
 
     /**
-     * PUBLIC : Recherche uniquement parmi les livres disponibles.
+     * PUBLIC : Recherche uniquement parmi les livres disponibles au catalogue.
      */
     @GetMapping("/search")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam String keyword) {
